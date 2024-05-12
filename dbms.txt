@@ -1,0 +1,2426 @@
+﻿1.  Consider the insurance database given below. 
+PERSON(driver_id, name, address) CAR(regno, model,year ) ACCIDENT(report_number,accd_date,location) OWNS(driver_id,regno) PARTICIPATED(driver_id,regno,report_number,damage_amount) 
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation.
+ii. Update the damage amount for the car with specific regno in the accident with report number 12 to 25000. 
+iii. Add a new accident to the database. 
+iv. Find the total number of people who owned cars that were involved in accidents in the year 2008. 
+v. Write a PL/SQL to find and display the sum of first n natural numbers. 
+
+
+SOLUTION:-
+
+
+CREATE TABLE PERSON (
+    driver_id NUMBER PRIMARY KEY,
+    name VARCHAR2(50),
+    address VARCHAR2(100)
+);
+
+
+CREATE TABLE CAR (
+    regno NUMBER PRIMARY KEY,
+    model VARCHAR2(50),
+    year NUMBER
+);
+
+
+CREATE TABLE ACCIDENT (
+    report_number NUMBER PRIMARY KEY,
+    accd_date DATE,
+    location VARCHAR2(100)
+);
+
+
+CREATE TABLE OWNS (
+    driver_id NUMBER,
+    regno NUMBER,
+    PRIMARY KEY (driver_id, regno),
+    FOREIGN KEY (driver_id) REFERENCES PERSON(driver_id),
+    FOREIGN KEY (regno) REFERENCES CAR(regno)
+);
+
+
+CREATE TABLE PARTICIPATED (
+    driver_id NUMBER,
+    regno NUMBER,
+    report_number NUMBER,
+    damage_amount NUMBER,
+    PRIMARY KEY (driver_id, regno, report_number),
+    FOREIGN KEY (driver_id, regno) REFERENCES OWNS(driver_id, regno),
+    FOREIGN KEY (report_number) REFERENCES ACCIDENT(report_number)
+);
+
+
+
+
+INSERT INTO PERSON VALUES (1, 'John Doe', '123 Main St');
+INSERT INTO PERSON VALUES (2, 'Jane Smith', '456 Elm St');
+INSERT INTO PERSON VALUES (3, 'Michael Johnson', '789 Oak St');
+INSERT INTO PERSON VALUES (4, 'Emily Brown', '101 Pine St');
+INSERT INTO PERSON VALUES (5, 'David Wilson', '222 Maple St');
+
+
+INSERT INTO CAR VALUES (101, 'Toyota Camry', 2008);
+INSERT INTO CAR VALUES (102, 'Honda Civic', 2010);
+INSERT INTO CAR VALUES (103, 'Ford Mustang', 2008);
+INSERT INTO CAR VALUES (104, 'Chevrolet Malibu', 2012);
+INSERT INTO CAR VALUES (105, 'Nissan Altima', 2009);
+
+
+INSERT INTO ACCIDENT VALUES (11, TO_DATE('2024-01-15', 'YYYY-MM-DD'), 'Intersection of 5th and Main');
+INSERT INTO ACCIDENT VALUES (12, TO_DATE('2024-03-20', 'YYYY-MM-DD'), 'Highway 101');
+INSERT INTO ACCIDENT VALUES (13, TO_DATE('2024-05-05', 'YYYY-MM-DD'), 'Parking lot of ABC Mall');
+INSERT INTO ACCIDENT VALUES (14, TO_DATE('2024-06-10', 'YYYY-MM-DD'), 'Residential area near Lake St');
+INSERT INTO ACCIDENT VALUES (15, TO_DATE('2024-08-12', 'YYYY-MM-DD'), 'Downtown on Jefferson St');
+
+
+INSERT INTO OWNS VALUES (1, 101);
+INSERT INTO OWNS VALUES (2, 102);
+INSERT INTO OWNS VALUES (3, 103);
+INSERT INTO OWNS VALUES (4, 104);
+INSERT INTO OWNS VALUES (5, 105);
+
+
+INSERT INTO PARTICIPATED VALUES (1, 101, 12, 5000);
+INSERT INTO PARTICIPATED VALUES (2, 102, 12, 3000);
+INSERT INTO PARTICIPATED VALUES (3, 103, 11, 7000);
+INSERT INTO PARTICIPATED VALUES (4, 104, 15, 10000);
+INSERT INTO PARTICIPATED VALUES (5, 105, 14, 2000);
+
+
+
+
+UPDATE PARTICIPATED
+SET damage_amount = 25000
+WHERE regno = 101 AND report_number = 12;
+
+
+
+
+INSERT INTO ACCIDENT VALUES (16, TO_DATE('2024-09-25', 'YYYY-MM-DD'), 'Highway 405');
+
+
+
+
+SELECT COUNT(DISTINCT driver_id)
+FROM OWNS
+JOIN PARTICIPATED ON OWNS.driver_id = PARTICIPATED.driver_id
+JOIN ACCIDENT ON PARTICIPATED.report_number = ACCIDENT.report_number
+JOIN CAR ON OWNS.regno = CAR.regno
+WHERE CAR.year = 2008;
+
+
+
+
+DECLARE
+    n_value INT := 10; -- Change the value of n here
+    total_sum INT := 0;
+BEGIN
+    FOR i IN 1..n_value LOOP
+        total_sum := total_sum + i;
+    END LOOP;
+    
+    DBMS_OUTPUT.PUT_LINE('Sum of first ' || n_value || ' natural numbers: ' || total_sum);
+END;
+/
+
+
+
+
+
+
+2. Consider the following employee and department tables. 
+EMPLOYEE(empno, ename, designation, manager, hiredate, salary, commission,  deptno) 
+DEPARTMENT(deptno, dname, location) 
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation. 
+ii. List the names of employees whose name contain substring ‘LA’. 
+iii. List the details of employees of salary are greater than or equal to the average salary of 
+employee table. 
+iv. Create a view which consists of details of all ‘SALESMAN’.  
+v. Write a PL/SQL to display the empno,job,salary of all employees in employee table.
+
+
+
+
+SOLUTION:-
+
+
+CREATE TABLE EMPLOYEE (
+    empno NUMBER PRIMARY KEY,
+    ename VARCHAR2(50),
+    designation VARCHAR2(50),
+    manager NUMBER,
+    hiredate DATE,
+    salary NUMBER,
+    commission NUMBER,
+    deptno NUMBER,
+    FOREIGN KEY (deptno) REFERENCES DEPARTMENT(deptno)
+);
+
+
+CREATE TABLE DEPARTMENT (
+    deptno NUMBER PRIMARY KEY,
+    dname VARCHAR2(50),
+    location VARCHAR2(100)
+);
+
+
+
+
+INSERT INTO EMPLOYEE VALUES (1, 'John Smith', 'Manager', NULL, TO_DATE('2022-01-15', 'YYYY-MM-DD'), 60000, NULL, 1);
+INSERT INTO EMPLOYEE VALUES (2, 'Alice Lane', 'Salesman', 1, TO_DATE('2022-03-20', 'YYYY-MM-DD'), 40000, 5000, 1);
+INSERT INTO EMPLOYEE VALUES (3, 'Robert Black', 'Clerk', 1, TO_DATE('2022-05-05', 'YYYY-MM-DD'), 30000, NULL, 2);
+INSERT INTO EMPLOYEE VALUES (4, 'Michael Clark', 'Manager', NULL, TO_DATE('2022-06-10', 'YYYY-MM-DD'), 65000, NULL, 2);
+INSERT INTO EMPLOYEE VALUES (5, 'Laura Adams', 'Salesman', 4, TO_DATE('2022-08-12', 'YYYY-MM-DD'), 42000, 3000, 2);
+
+
+INSERT INTO DEPARTMENT (deptno, dname, location) VALUES (1, 'Sales', 'New York');
+INSERT INTO DEPARTMENT (deptno, dname, location) VALUES (2, 'Finance', 'Los Angeles');
+INSERT INTO DEPARTMENT (deptno, dname, location) VALUES (3, 'Marketing', 'Chicago');
+INSERT INTO DEPARTMENT (deptno, dname, location) VALUES (4, 'Human Resources', 'Houston');
+INSERT INTO DEPARTMENT (deptno, dname, location) VALUES (5, 'Research and Development', 'San Francisco');
+
+
+
+
+SELECT ename
+FROM EMPLOYEE
+WHERE ename LIKE '%LA%';
+
+
+SELECT *
+FROM EMPLOYEE
+WHERE salary >= (SELECT AVG(salary) FROM EMPLOYEE);
+
+
+CREATE OR REPLACE VIEW SALESMAN_VIEW AS
+SELECT *
+FROM EMPLOYEE
+WHERE designation = 'Salesman';
+
+
+
+
+CREATE OR REPLACE PROCEDURE EMPLOYEE_DETAILS AS
+BEGIN
+    FOR emp_record IN (SELECT empno, designation, salary FROM EMPLOYEE) LOOP
+        DBMS_OUTPUT.PUT_LINE('EmpNo: ' || emp_record.empno || ', Job: ' || emp_record.designation || ', Salary: ' || emp_record.salary);
+    END LOOP;
+END EMPLOYEE_DETAILS;
+/
+
+
+
+
+3.Consider the following tables. 
+SAILOR(sid, sname, rating, age) 
+BOATS(bid, bname, colour) 
+RESERVES(sid, bid, day) 
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation. 
+ii. List the sailors in the descending order of their rating.
+iii. List the sailors whose youngest sailor for each rating and who can vote. 
+iv. List the sailors who have reserved for both ‘RED’ and ‘GREEN’ boats. 
+v. Write a PL/SQL to find the factorial of a number
+
+
+SOLUTION:-
+
+
+CREATE TABLE SAILOR (
+    sid NUMBER PRIMARY KEY,
+    sname VARCHAR2(50),
+    rating NUMBER,
+    age NUMBER
+);
+
+
+CREATE TABLE BOATS (
+    bid NUMBER PRIMARY KEY,
+    bname VARCHAR2(50),
+    colour VARCHAR2(50)
+);
+
+
+CREATE TABLE RESERVES (
+    sid NUMBER,
+    bid NUMBER,
+    day DATE,
+    PRIMARY KEY (sid, bid),
+    FOREIGN KEY (sid) REFERENCES SAILOR(sid),
+    FOREIGN KEY (bid) REFERENCES BOATS(bid)
+);
+
+
+
+
+INSERT INTO SAILOR VALUES (1, 'John', 8, 30);
+INSERT INTO SAILOR VALUES (2, 'Alice', 7, 25);
+INSERT INTO SAILOR VALUES (3, 'Robert', 6, 28);
+INSERT INTO SAILOR VALUES (4, 'Michael', 8, 32);
+INSERT INTO SAILOR VALUES (5, 'Laura', 7, 29);
+
+
+INSERT INTO BOATS VALUES (101, 'Boat1', 'Red');
+INSERT INTO BOATS VALUES (102, 'Boat2', 'Green');
+INSERT INTO BOATS VALUES (103, 'Boat3', 'Blue');
+INSERT INTO BOATS VALUES (104, 'Boat4', 'Red');
+INSERT INTO BOATS VALUES (105, 'Boat5', 'Green');
+
+
+INSERT INTO RESERVES VALUES (1, 101, TO_DATE('2024-05-01', 'YYYY-MM-DD'));
+INSERT INTO RESERVES VALUES (2, 102, TO_DATE('2024-05-02', 'YYYY-MM-DD'));
+INSERT INTO RESERVES VALUES (3, 103, TO_DATE('2024-05-03', 'YYYY-MM-DD'));
+INSERT INTO RESERVES VALUES (4, 101, TO_DATE('2024-05-04', 'YYYY-MM-DD'));
+INSERT INTO RESERVES VALUES (5, 102, TO_DATE('2024-05-05', 'YYYY-MM-DD'));
+
+
+
+
+SELECT *
+FROM SAILOR
+ORDER BY rating DESC;
+
+
+
+
+SELECT *
+FROM SAILOR
+WHERE (rating, age) IN (SELECT rating, MIN(age) FROM SAILOR GROUP BY rating) AND age >= 18;
+
+
+
+
+SELECT DISTINCT s.*
+FROM SAILOR s
+JOIN RESERVES r ON s.sid = r.sid
+JOIN BOATS b ON r.bid = b.bid
+WHERE b.colour IN ('Red', 'Green')
+GROUP BY s.sid
+HAVING COUNT(DISTINCT b.colour) = 2;
+
+
+
+
+CREATE OR REPLACE FUNCTION factorial(n IN NUMBER) RETURN NUMBER IS
+    result NUMBER := 1;
+BEGIN
+    FOR i IN 1..n LOOP
+        result := result * i;
+    END LOOP;
+    RETURN result;
+END factorial;
+/
+
+
+SELECT factorial(5) FROM DUAL;
+
+
+
+
+4. Consider the following relations for order processing database application in a company. 
+CUSTOMER(custno, cname, city) ORDER(orderno, odate, custno, ord_amt ) ORDER_ITEM(orderno, itemno, quantity) ITEM(itemno, unitprice) SHIPMENT(orderno, warehouseno, ship_date) WAREHOUSE(warehouseno, city) 
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation. 
+ii. Produce a listing: custname , No_of_orders , Avg_order_amount , where the middle column is the total number of orders by the customer and the last column is the average order amount for that customer. 
+iii. List the orderno for orders that were shipped from all the warehouses that the company has in a specific city. 
+iv. Demonstrate the deletion of an item from the ITEM table and demonstrate a method of handling the rows in the ORDER_ITEM table that contains this particular item.  
+v. Write a PL/SQL to generate Fibonacci series. 
+
+
+
+
+SOLUTION:-
+
+
+CREATE TABLE CUSTOMER (
+    custno NUMBER PRIMARY KEY,
+    cname VARCHAR2(50),
+    city VARCHAR2(50)
+);
+
+
+CREATE TABLE ORDER (
+    orderno NUMBER PRIMARY KEY,
+    odate DATE,
+    custno NUMBER,
+    ord_amt NUMBER,
+    FOREIGN KEY (custno) REFERENCES CUSTOMER(custno)
+);
+
+
+CREATE TABLE ORDER_ITEM (
+    orderno NUMBER,
+    itemno NUMBER,
+    quantity NUMBER,
+    PRIMARY KEY (orderno, itemno),
+    FOREIGN KEY (orderno) REFERENCES ORDER(orderno)
+);
+
+
+CREATE TABLE ITEM (
+    itemno NUMBER PRIMARY KEY,
+    unitprice NUMBER
+);
+
+
+CREATE TABLE SHIPMENT (
+    orderno NUMBER,
+    warehouseno NUMBER,
+    ship_date DATE,
+    PRIMARY KEY (orderno, warehouseno),
+    FOREIGN KEY (orderno) REFERENCES ORDER(orderno)
+);
+
+
+CREATE TABLE WAREHOUSE (
+    warehouseno NUMBER PRIMARY KEY,
+    city VARCHAR2(50)
+);
+
+
+-- Inserting tuples
+INSERT INTO CUSTOMER VALUES (1, 'John Doe', 'New York');
+INSERT INTO CUSTOMER VALUES (2, 'Alice Smith', 'Los Angeles');
+INSERT INTO CUSTOMER VALUES (3, 'Michael Johnson', 'Chicago');
+INSERT INTO CUSTOMER VALUES (4, 'Emily Brown', 'Houston');
+INSERT INTO CUSTOMER VALUES (5, 'David Wilson', 'San Francisco');
+
+
+INSERT INTO ORDER VALUES (101, TO_DATE('2024-01-15', 'YYYY-MM-DD'), 1, 500);
+INSERT INTO ORDER VALUES (102, TO_DATE('2024-02-20', 'YYYY-MM-DD'), 2, 700);
+INSERT INTO ORDER VALUES (103, TO_DATE('2024-03-25', 'YYYY-MM-DD'), 3, 800);
+INSERT INTO ORDER VALUES (104, TO_DATE('2024-04-10', 'YYYY-MM-DD'), 4, 600);
+INSERT INTO ORDER VALUES (105, TO_DATE('2024-05-12', 'YYYY-MM-DD'), 5, 900);
+
+
+INSERT INTO ORDER_ITEM VALUES (101, 1, 2);
+INSERT INTO ORDER_ITEM VALUES (101, 2, 3);
+INSERT INTO ORDER_ITEM VALUES (102, 3, 1);
+INSERT INTO ORDER_ITEM VALUES (102, 4, 4);
+INSERT INTO ORDER_ITEM VALUES (103, 5, 2);
+
+
+INSERT INTO ITEM VALUES (1, 50);
+INSERT INTO ITEM VALUES (2, 100);
+INSERT INTO ITEM VALUES (3, 75);
+INSERT INTO ITEM VALUES (4, 120);
+INSERT INTO ITEM VALUES (5, 90);
+
+
+INSERT INTO SHIPMENT VALUES (101, 1, TO_DATE('2024-01-20', 'YYYY-MM-DD'));
+INSERT INTO SHIPMENT VALUES (102, 2, TO_DATE('2024-02-25', 'YYYY-MM-DD'));
+INSERT INTO SHIPMENT VALUES (103, 3, TO_DATE('2024-03-30', 'YYYY-MM-DD'));
+INSERT INTO SHIPMENT VALUES (104, 4, TO_DATE('2024-04-15', 'YYYY-MM-DD'));
+INSERT INTO SHIPMENT VALUES (105, 5, TO_DATE('2024-05-20', 'YYYY-MM-DD'));
+
+
+INSERT INTO WAREHOUSE VALUES (1, 'New York');
+INSERT INTO WAREHOUSE VALUES (2, 'Los Angeles');
+INSERT INTO WAREHOUSE VALUES (3, 'Chicago');
+INSERT INTO WAREHOUSE VALUES (4, 'Houston');
+INSERT INTO WAREHOUSE VALUES (5, 'San Francisco');
+
+
+
+
+
+
+SELECT c.cname,
+       COUNT(o.orderno) AS No_of_orders,
+       AVG(o.ord_amt) AS Avg_order_amount
+FROM CUSTOMER c
+LEFT JOIN "ORDER" o ON c.custno = o.custno
+GROUP BY c.cname;
+
+
+
+
+SELECT orderno
+FROM SHIPMENT s
+WHERE NOT EXISTS (
+    SELECT w.warehouseno
+    FROM WAREHOUSE w
+    WHERE w.city = 'New York'
+    AND NOT EXISTS (
+        SELECT 1
+        FROM SHIPMENT s2
+        WHERE s2.warehouseno = w.warehouseno
+        AND s2.orderno = s.orderno
+    )
+);
+
+
+
+
+-- Deleting item from ITEM table
+DELETE FROM ITEM WHERE itemno = 1;
+
+
+-- Handling rows in ORDER_ITEM table
+-- Option 1: Delete rows from ORDER_ITEM for the deleted item
+DELETE FROM ORDER_ITEM WHERE itemno = 1;
+
+
+-- Option 2: Update itemno to NULL or another value in ORDER_ITEM for the deleted item
+UPDATE ORDER_ITEM SET itemno = NULL WHERE itemno = 1;
+
+
+
+
+CREATE OR REPLACE PROCEDURE Fibonacci(n IN NUMBER) AS
+    a NUMBER := 0;
+    b NUMBER := 1;
+    temp NUMBER;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(a);
+    DBMS_OUTPUT.PUT_LINE(b);
+    FOR i IN 3..n LOOP
+        temp := a + b;
+        DBMS_OUTPUT.PUT_LINE(temp);
+        a := b;
+        b := temp;
+    END LOOP;
+END Fibonacci;
+/
+
+
+
+
+BEGIN
+    Fibonacci(10);
+END;
+/
+
+
+
+
+5. Consider the following database of student enrollment in courses and books adopted for that course. 
+STUDENT(regno, name, major, bdate) COURSE(courseno, cname, dept) ENROLL(regno, courseno, sem, marks) BOOK_ADOPTION(courseno, sem, book_isbn) TEXT(book_isbn,book_title,publisher, author) 
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation.
+ii. Add a new text book to the database and make this book to be adopted by some department. 
+iii. Produce a list of text books ( includes courseno , book_isbn , book_title ) in the alphabetical order for courses offered by the 'CS' department that use more than two books. 
+iv. List any department that has all its books published by a specific publisher. 
+v. Write a PL/SQL to find topper among ‘n’ students.
+
+
+SOLUTION:-
+
+
+CREATE TABLE STUDENT (
+    regno NUMBER PRIMARY KEY,
+    name VARCHAR2(50),
+    major VARCHAR2(50),
+    bdate DATE
+);
+
+
+CREATE TABLE COURSE (
+    courseno NUMBER PRIMARY KEY,
+    cname VARCHAR2(100),
+    dept VARCHAR2(50)
+);
+
+
+CREATE TABLE ENROLL (
+    regno NUMBER,
+    courseno NUMBER,
+    sem VARCHAR2(20),
+    marks NUMBER,
+    PRIMARY KEY (regno, courseno, sem),
+    FOREIGN KEY (regno) REFERENCES STUDENT(regno),
+    FOREIGN KEY (courseno) REFERENCES COURSE(courseno)
+);
+
+
+CREATE TABLE BOOK_ADOPTION (
+    courseno NUMBER,
+    sem VARCHAR2(20),
+    book_isbn NUMBER,
+    PRIMARY KEY (courseno, sem, book_isbn),
+    FOREIGN KEY (courseno, sem) REFERENCES ENROLL(courseno, sem),
+    FOREIGN KEY (book_isbn) REFERENCES TEXT(book_isbn)
+);
+
+
+CREATE TABLE TEXT (
+    book_isbn NUMBER PRIMARY KEY,
+    book_title VARCHAR2(100),
+    publisher VARCHAR2(100),
+    author VARCHAR2(100)
+);
+
+
+-- Inserting tuples
+INSERT INTO STUDENT VALUES (1, 'John Doe', 'Computer Science', TO_DATE('2000-01-01', 'YYYY-MM-DD'));
+INSERT INTO STUDENT VALUES (2, 'Alice Smith', 'Mathematics', TO_DATE('1999-05-15', 'YYYY-MM-DD'));
+INSERT INTO STUDENT VALUES (3, 'Michael Johnson', 'Physics', TO_DATE('2001-03-20', 'YYYY-MM-DD'));
+INSERT INTO STUDENT VALUES (4, 'Emily Brown', 'Chemistry', TO_DATE('2002-07-10', 'YYYY-MM-DD'));
+INSERT INTO STUDENT VALUES (5, 'David Wilson', 'Biology', TO_DATE('2000-09-12', 'YYYY-MM-DD'));
+
+
+INSERT INTO COURSE VALUES (101, 'Introduction to Computer Science', 'CS');
+INSERT INTO COURSE VALUES (102, 'Calculus', 'Math');
+INSERT INTO COURSE VALUES (103, 'Modern Physics', 'Physics');
+INSERT INTO COURSE VALUES (104, 'Organic Chemistry', 'Chem');
+INSERT INTO COURSE VALUES (105, 'Cell Biology', 'Biology');
+
+
+INSERT INTO ENROLL VALUES (1, 101, 'Spring', 85);
+INSERT INTO ENROLL VALUES (2, 102, 'Spring', 90);
+INSERT INTO ENROLL VALUES (3, 103, 'Spring', 88);
+INSERT INTO ENROLL VALUES (4, 104, 'Spring', 82);
+INSERT INTO ENROLL VALUES (5, 105, 'Spring', 95);
+
+
+INSERT INTO TEXT VALUES (101, 'Intro to CS Textbook', 'ABC Publishers', 'John Smith');
+INSERT INTO TEXT VALUES (102, 'Calculus Textbook', 'XYZ Publications', 'Alice Johnson');
+INSERT INTO TEXT VALUES (103, 'Modern Physics Textbook', 'DEF Books', 'Michael Brown');
+INSERT INTO TEXT VALUES (104, 'Organic Chemistry Textbook', 'GHI Press', 'Emily Wilson');
+INSERT INTO TEXT VALUES (105, 'Cell Biology Textbook', 'JKL Publishing', 'David Taylor');
+
+
+INSERT INTO BOOK_ADOPTION VALUES (101, 'Spring', 101);
+INSERT INTO BOOK_ADOPTION VALUES (102, 'Spring', 102);
+INSERT INTO BOOK_ADOPTION VALUES (103, 'Spring', 103);
+INSERT INTO BOOK_ADOPTION VALUES (104, 'Spring', 104);
+INSERT INTO BOOK_ADOPTION VALUES (105, 'Spring', 105);
+
+
+
+
+INSERT INTO TEXT VALUES (106, 'New Textbook', 'MNO Publishers', 'Sarah Johnson');
+
+
+INSERT INTO BOOK_ADOPTION VALUES (101, 'Spring', 106);
+
+
+
+
+SELECT b.courseno, b.book_isbn, t.book_title
+FROM BOOK_ADOPTION b
+JOIN TEXT t ON b.book_isbn = t.book_isbn
+JOIN COURSE c ON b.courseno = c.courseno
+WHERE c.dept = 'CS'
+GROUP BY b.courseno, b.book_isbn, t.book_title
+HAVING COUNT(*) > 2
+ORDER BY t.book_title;
+
+
+
+
+SELECT c.dept
+FROM COURSE c
+LEFT JOIN BOOK_ADOPTION b ON c.courseno = b.courseno
+LEFT JOIN TEXT t ON b.book_isbn = t.book_isbn
+GROUP BY c.dept
+HAVING COUNT(DISTINCT t.publisher) = 1
+AND COUNT(*) > 0;
+
+
+
+
+CREATE OR REPLACE PROCEDURE Topper(n IN NUMBER) AS
+BEGIN
+    FOR s IN (
+        SELECT regno, name, marks, RANK() OVER (ORDER BY marks DESC) AS ranking
+        FROM (
+            SELECT regno, name, marks
+            FROM STUDENT
+            JOIN ENROLL ON STUDENT.regno = ENROLL.regno
+            WHERE ROWNUM <= n
+            ORDER BY marks DESC
+        )
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE('Rank: ' || s.ranking || ', Reg No: ' || s.regno || ', Name: ' || s.name || ', Marks: ' || s.marks);
+    END LOOP;
+END Topper;
+/
+
+
+
+
+BEGIN
+    Topper(3); -- Finds top 3 students
+END;
+/
+
+
+
+
+
+
+6. The following are maintained by a book dealer. 
+AUTHOR(author_id, name, city, country) PUBLISHER(publisher_id, name, city, country) CATALOG(book_id, title, author_id, publisher_id , category_id, year, price) CATEGORY(category_id, description) ORDER_DETAILS(order_no, book_id, quantity) 
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation. 
+ii. Give the details of the authors who have 2 or more books in the catalog and the price of the books is greater than the average price of the books in the catalog and the year of publication is after 2000. 
+iii. Find the author of the book that has maximum sales.
+iv. Demonstrate how you increase the price of books published by a specific publisher by 10%. 
+v. Write a PL/SQL to find total marks for n students. 
+
+
+SOLUTION:-
+
+
+CREATE TABLE AUTHOR (
+    author_id NUMBER PRIMARY KEY,
+    name VARCHAR2(100),
+    city VARCHAR2(100),
+    country VARCHAR2(100)
+);
+
+
+CREATE TABLE PUBLISHER (
+    publisher_id NUMBER PRIMARY KEY,
+    name VARCHAR2(100),
+    city VARCHAR2(100),
+    country VARCHAR2(100)
+);
+
+
+CREATE TABLE CATEGORY (
+    category_id NUMBER PRIMARY KEY,
+    description VARCHAR2(100)
+);
+
+
+CREATE TABLE CATALOG (
+    book_id NUMBER PRIMARY KEY,
+    title VARCHAR2(100),
+    author_id NUMBER,
+    publisher_id NUMBER,
+    category_id NUMBER,
+    year NUMBER,
+    price NUMBER,
+    FOREIGN KEY (author_id) REFERENCES AUTHOR(author_id),
+    FOREIGN KEY (publisher_id) REFERENCES PUBLISHER(publisher_id),
+    FOREIGN KEY (category_id) REFERENCES CATEGORY(category_id)
+);
+
+
+CREATE TABLE ORDER_DETAILS (
+    order_no NUMBER,
+    book_id NUMBER,
+    quantity NUMBER,
+    PRIMARY KEY (order_no, book_id),
+    FOREIGN KEY (book_id) REFERENCES CATALOG(book_id)
+);
+
+
+-- Inserting tuples
+INSERT INTO AUTHOR VALUES (1, 'John Smith', 'New York', 'USA');
+INSERT INTO AUTHOR VALUES (2, 'Alice Johnson', 'Los Angeles', 'USA');
+INSERT INTO AUTHOR VALUES (3, 'Michael Brown', 'Chicago', 'USA');
+INSERT INTO AUTHOR VALUES (4, 'Emily Wilson', 'Houston', 'USA');
+INSERT INTO AUTHOR VALUES (5, 'David Taylor', 'San Francisco', 'USA');
+
+
+INSERT INTO PUBLISHER VALUES (101, 'ABC Publications', 'New York', 'USA');
+INSERT INTO PUBLISHER VALUES (102, 'XYZ Books', 'Los Angeles', 'USA');
+INSERT INTO PUBLISHER VALUES (103, 'DEF Press', 'Chicago', 'USA');
+INSERT INTO PUBLISHER VALUES (104, 'GHI Publishers', 'Houston', 'USA');
+INSERT INTO PUBLISHER VALUES (105, 'JKL Publishing', 'San Francisco', 'USA');
+
+
+INSERT INTO CATEGORY VALUES (201, 'Fiction');
+INSERT INTO CATEGORY VALUES (202, 'Non-Fiction');
+INSERT INTO CATEGORY VALUES (203, 'Science Fiction');
+INSERT INTO CATEGORY VALUES (204, 'Mystery');
+INSERT INTO CATEGORY VALUES (205, 'Thriller');
+
+
+INSERT INTO CATALOG VALUES (301, 'Book1', 1, 101, 201, 2005, 50);
+INSERT INTO CATALOG VALUES (302, 'Book2', 2, 102, 202, 2008, 60);
+INSERT INTO CATALOG VALUES (303, 'Book3', 3, 103, 203, 2010, 70);
+INSERT INTO CATALOG VALUES (304, 'Book4', 4, 104, 204, 2015, 80);
+INSERT INTO CATALOG VALUES (305, 'Book5', 5, 105, 205, 2018, 90);
+
+
+INSERT INTO ORDER_DETAILS VALUES (1001, 301, 2);
+INSERT INTO ORDER_DETAILS VALUES (1002, 302, 3);
+INSERT INTO ORDER_DETAILS VALUES (1004, 304, 4);
+INSERT INTO ORDER_DETAILS VALUES (1005, 305, 5);
+
+
+
+
+SELECT a.name AS author_name,
+       COUNT(c.book_id) AS num_books,
+       AVG(c.price) AS avg_price,
+       MIN(c.year) AS min_year
+FROM AUTHOR a
+JOIN CATALOG c ON a.author_id = c.author_id
+WHERE c.year > 2000
+GROUP BY a.name
+HAVING COUNT(c.book_id) >= 2
+AND AVG(c.price) > (SELECT AVG(price) FROM CATALOG)
+ORDER BY a.name;
+
+
+
+
+SELECT a.name AS author_name
+FROM AUTHOR a
+JOIN CATALOG c ON a.author_id = c.author_id
+JOIN ORDER_DETAILS od ON c.book_id = od.book_id
+GROUP BY a.name
+ORDER BY SUM(od.quantity) DESC
+FETCH FIRST ROW ONLY;
+
+
+
+
+UPDATE CATALOG
+SET price = price * 1.1
+WHERE publisher_id = (SELECT publisher_id FROM PUBLISHER WHERE name = 'XYZ Books');
+
+
+
+
+CREATE OR REPLACE PROCEDURE TotalMarks(n IN NUMBER) AS
+    total_marks NUMBER := 0;
+BEGIN
+    FOR s IN (
+        SELECT marks
+        FROM (
+            SELECT marks
+            FROM ORDER_DETAILS
+            WHERE ROWNUM <= n
+            ORDER BY marks DESC
+        )
+    ) LOOP
+        total_marks := total_marks + s.marks;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('Total Marks for top ' || n || ' students: ' || total_marks);
+END TotalMarks;
+/
+
+
+
+
+BEGIN
+    TotalMarks(3); -- Finds total marks for top 3 students
+END;
+/
+
+
+
+
+7. Consider the following database for a banking enterprise. 
+CUSTOMER_FIXED_DEPOSIT(cust_id, last_name,mid_name,first_name, 
+fixed_deposit_no, amount, rate_of_interest) 
+CUSTOMER_LOAN(loan_no, cust_id, amount) 
+CUSTOMER_DETAILS(cust_id, acc_type ) 
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation. 
+ii. List customer names of all customer who have taken a loan > 3,00,000.iii. List customer names of all customer who have the same account type as customer ‘jones simon’. 
+iv. List customer names of all customer who do not have a fixed deposit.
+v. Write a PL/SQL to find factorial of n number. 
+
+
+SOLUTION:-
+
+
+CREATE TABLE CUSTOMER_FIXED_DEPOSIT (
+    cust_id NUMBER,
+    last_name VARCHAR2(50),
+    mid_name VARCHAR2(50),
+    first_name VARCHAR2(50),
+    fixed_deposit_no NUMBER PRIMARY KEY,
+    amount NUMBER,
+    rate_of_interest NUMBER,
+    FOREIGN KEY (cust_id) REFERENCES CUSTOMER_DETAILS(cust_id)
+);
+
+
+CREATE TABLE CUSTOMER_LOAN (
+    loan_no NUMBER PRIMARY KEY,
+    cust_id NUMBER,
+    amount NUMBER,
+    FOREIGN KEY (cust_id) REFERENCES CUSTOMER_DETAILS(cust_id)
+);
+
+
+CREATE TABLE CUSTOMER_DETAILS (
+    cust_id NUMBER PRIMARY KEY,
+    acc_type VARCHAR2(50)
+);
+
+
+-- Inserting tuples
+INSERT INTO CUSTOMER_FIXED_DEPOSIT VALUES (101, 'Smith', NULL, 'John', 1001, 500000, 5);
+INSERT INTO CUSTOMER_FIXED_DEPOSIT VALUES (102, 'Johnson', NULL, 'Alice', 1002, 400000, 6);
+INSERT INTO CUSTOMER_FIXED_DEPOSIT VALUES (103, 'Brown', NULL, 'Michael', 1003, 600000, 4);
+INSERT INTO CUSTOMER_FIXED_DEPOSIT VALUES (104, 'Wilson', NULL, 'Emily', 1004, 450000, 5);
+INSERT INTO CUSTOMER_FIXED_DEPOSIT VALUES (105, 'Taylor', NULL, 'David', 1005, 550000, 4);
+
+
+INSERT INTO CUSTOMER_LOAN VALUES (2001, 101, 350000);
+INSERT INTO CUSTOMER_LOAN VALUES (2002, 102, 400000);
+INSERT INTO CUSTOMER_LOAN VALUES (2003, 103, 300000);
+INSERT INTO CUSTOMER_LOAN VALUES (2004, 104, 450000);
+INSERT INTO CUSTOMER_LOAN VALUES (2005, 105, 500000);
+
+
+INSERT INTO CUSTOMER_DETAILS VALUES (101, 'Savings');
+INSERT INTO CUSTOMER_DETAILS VALUES (102, 'Current');
+INSERT INTO CUSTOMER_DETAILS VALUES (103, 'Savings');
+INSERT INTO CUSTOMER_DETAILS VALUES (104, 'Current');
+INSERT INTO CUSTOMER_DETAILS VALUES (105, 'Savings');
+
+
+
+
+SELECT last_name, first_name
+FROM CUSTOMER_FIXED_DEPOSIT f
+JOIN CUSTOMER_LOAN l ON f.cust_id = l.cust_id
+WHERE l.amount > 300000;
+
+
+
+
+SELECT c.last_name, c.first_name
+FROM CUSTOMER_DETAILS c
+WHERE c.acc_type = (SELECT acc_type FROM CUSTOMER_DETAILS WHERE last_name = 'Jones' AND first_name = 'Simon');
+
+
+
+
+SELECT last_name, first_name
+FROM CUSTOMER_DETAILS
+WHERE cust_id NOT IN (SELECT cust_id FROM CUSTOMER_FIXED_DEPOSIT);
+
+
+
+
+CREATE OR REPLACE FUNCTION Factorial(n IN NUMBER) RETURN NUMBER IS
+    result NUMBER := 1;
+BEGIN
+    FOR i IN 1..n LOOP
+        result := result * i;
+    END LOOP;
+    RETURN result;
+END Factorial;
+/
+
+
+
+
+SELECT Factorial(5) FROM DUAL;
+
+
+
+
+8. Consider the following databases. 
+CUSTOMER(custno, custname, city, phone) 
+ITEM(itemno, itemname, itemprice, quantity) 
+INVOICE(invno, invdate, custno) 
+INVITEM(invno, itemno, quantity) 
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation. 
+ii. Display all item name along with the quantity sold. 
+iii. Display item name and price as single column like “<item> price is <price>”  
+iv. Display invoices, customer name and item names together (use join). 
+v. Write a PL/SQL to calculate and print employee pay slip using procedure. 
+
+
+SOLUTION:-
+
+
+CREATE TABLE CUSTOMER (
+    custno NUMBER PRIMARY KEY,
+    custname VARCHAR2(100),
+    city VARCHAR2(100),
+    phone VARCHAR2(20)
+);
+
+
+CREATE TABLE ITEM (
+    itemno NUMBER PRIMARY KEY,
+    itemname VARCHAR2(100),
+    itemprice NUMBER,
+    quantity NUMBER
+);
+
+
+CREATE TABLE INVOICE (
+    invno NUMBER PRIMARY KEY,
+    invdate DATE,
+    custno NUMBER,
+    FOREIGN KEY (custno) REFERENCES CUSTOMER(custno)
+);
+
+
+CREATE TABLE INVITEM (
+    invno NUMBER,
+    itemno NUMBER,
+    quantity NUMBER,
+    PRIMARY KEY (invno, itemno),
+    FOREIGN KEY (invno) REFERENCES INVOICE(invno),
+    FOREIGN KEY (itemno) REFERENCES ITEM(itemno)
+);
+
+
+-- Inserting tuples
+INSERT INTO CUSTOMER VALUES (1, 'John Doe', 'New York', '123-456-7890');
+INSERT INTO CUSTOMER VALUES (2, 'Alice Smith', 'Los Angeles', '456-789-0123');
+INSERT INTO CUSTOMER VALUES (3, 'Michael Johnson', 'Chicago', '789-012-3456');
+INSERT INTO CUSTOMER VALUES (4, 'Emily Brown', 'Houston', '012-345-6789');
+INSERT INTO CUSTOMER VALUES (5, 'David Wilson', 'San Francisco', '345-678-9012');
+
+
+INSERT INTO ITEM VALUES (101, 'Laptop', 1000, 10);
+INSERT INTO ITEM VALUES (102, 'Printer', 200, 20);
+INSERT INTO ITEM VALUES (103, 'Mouse', 20, 50);
+INSERT INTO ITEM VALUES (104, 'Keyboard', 50, 30);
+INSERT INTO ITEM VALUES (105, 'Monitor', 300, 15);
+
+
+INSERT INTO INVOICE VALUES (1001, TO_DATE('2024-01-15', 'YYYY-MM-DD'), 1);
+INSERT INTO INVOICE VALUES (1002, TO_DATE('2024-02-20', 'YYYY-MM-DD'), 2);
+INSERT INTO INVOICE VALUES (1003, TO_DATE('2024-03-25', 'YYYY-MM-DD'), 3);
+INSERT INTO INVOICE VALUES (1004, TO_DATE('2024-04-10', 'YYYY-MM-DD'), 4);
+INSERT INTO INVOICE VALUES (1005, TO_DATE('2024-05-12', 'YYYY-MM-DD'), 5);
+
+
+INSERT INTO INVITEM VALUES (1001, 101, 2);
+INSERT INTO INVITEM VALUES (1002, 102, 3);
+INSERT INTO INVITEM VALUES (1003, 103, 1);
+INSERT INTO INVITEM VALUES (1004, 104, 4);
+INSERT INTO INVITEM VALUES (1005, 105, 5);
+
+
+
+
+SELECT i.itemname, SUM(ii.quantity) AS quantity_sold
+FROM ITEM i
+JOIN INVITEM ii ON i.itemno = ii.itemno
+GROUP BY i.itemname;
+
+
+
+
+SELECT itemname || ' price is ' || TO_CHAR(itemprice) AS item_and_price
+FROM ITEM;
+
+
+
+
+SELECT i.invno, c.custname, LISTAGG(it.itemname, ', ') WITHIN GROUP (ORDER BY it.itemname) AS item_names
+FROM INVOICE i
+JOIN CUSTOMER c ON i.custno = c.custno
+JOIN INVITEM ii ON i.invno = ii.invno
+JOIN ITEM it ON ii.itemno = it.itemno
+GROUP BY i.invno, c.custname;
+
+
+
+
+CREATE OR REPLACE PROCEDURE GeneratePaySlip(
+    emp_id IN NUMBER,
+    emp_name IN VARCHAR2,
+    basic_salary IN NUMBER,
+    allowance IN NUMBER,
+    tax_rate IN NUMBER
+) AS
+    gross_salary NUMBER;
+    net_salary NUMBER;
+    tax_amount NUMBER;
+BEGIN
+    gross_salary := basic_salary + allowance;
+    tax_amount := gross_salary * (tax_rate / 100);
+    net_salary := gross_salary - tax_amount;
+    
+    DBMS_OUTPUT.PUT_LINE('Employee ID: ' || emp_id);
+    DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_name);
+    DBMS_OUTPUT.PUT_LINE('Basic Salary: ' || TO_CHAR(basic_salary));
+    DBMS_OUTPUT.PUT_LINE('Allowance: ' || TO_CHAR(allowance));
+    DBMS_OUTPUT.PUT_LINE('Gross Salary: ' || TO_CHAR(gross_salary));
+    DBMS_OUTPUT.PUT_LINE('Tax Amount: ' || TO_CHAR(tax_amount));
+    DBMS_OUTPUT.PUT_LINE('Net Salary: ' || TO_CHAR(net_salary));
+END GeneratePaySlip;
+/
+
+
+
+
+BEGIN
+    GeneratePaySlip(101, 'John Doe', 50000, 10000, 15);
+END;
+/
+
+
+
+
+
+
+8. Consider the following databases.
+CUSTOMER(custno, custname, city, phone)
+ITEM(itemno, itemname, itemprice, quantity)
+INVOICE(invno, invdate, custno)
+INVITEM(invno, itemno, quantity)
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation.
+ii. Display all item name along with the quantity sold.
+iii. Display item name and price as single column like “<item> price is <price>” 
+iv. Display invoices, customer name and item names together (use join).
+v. Write a PL/SQL to calculate and print employee pay slip using procedure. 
+
+
+
+
+
+Solution
+
+
+### i. Creating Tables and Entering Data
+
+
+```sql
+CREATE TABLE CUSTOMER (
+    custno INT PRIMARY KEY,
+    custname VARCHAR(50),
+    city VARCHAR(50),
+    phone VARCHAR(15)
+);
+
+
+CREATE TABLE ITEM (
+    itemno INT PRIMARY KEY,
+    itemname VARCHAR(50),
+    itemprice DECIMAL(10, 2),
+    quantity INT
+);
+
+
+CREATE TABLE INVOICE (
+    invno INT PRIMARY KEY,
+    invdate DATE,
+    custno INT,
+    FOREIGN KEY (custno) REFERENCES CUSTOMER(custno)
+);
+
+
+CREATE TABLE INVITEM (
+    invno INT,
+    itemno INT,
+    quantity INT,
+    PRIMARY KEY (invno, itemno),
+    FOREIGN KEY (invno) REFERENCES INVOICE(invno),
+    FOREIGN KEY (itemno) REFERENCES ITEM(itemno)
+);
+
+
+INSERT INTO CUSTOMER VALUES (1, 'Alice', 'New York', '123-456-7890');
+INSERT INTO CUSTOMER VALUES (2, 'Bob', 'Los Angeles', '987-654-3210');
+INSERT INTO CUSTOMER VALUES (3, 'Charlie', 'Chicago', '555-123-4567');
+INSERT INTO CUSTOMER VALUES (4, 'David', 'Houston', '777-888-9999');
+INSERT INTO CUSTOMER VALUES (5, 'Eve', 'Miami', '444-222-1111');
+
+
+INSERT INTO ITEM VALUES (101, 'Laptop', 999.99, 10);
+INSERT INTO ITEM VALUES (102, 'Smartphone', 499.99, 20);
+INSERT INTO ITEM VALUES (103, 'Headphones', 49.99, 50);
+INSERT INTO ITEM VALUES (104, 'Tablet', 299.99, 15);
+INSERT INTO ITEM VALUES (105, 'Camera', 399.99, 5);
+
+
+INSERT INTO INVOICE VALUES (1001, '2024-05-01', 1);
+INSERT INTO INVOICE VALUES (1002, '2024-05-02', 2);
+INSERT INTO INVOICE VALUES (1003, '2024-05-03', 3);
+INSERT INTO INVOICE VALUES (1004, '2024-05-04', 4);
+INSERT INTO INVOICE VALUES (1005, '2024-05-05', 5);
+
+
+INSERT INTO INVITEM VALUES (1001, 101, 2);
+INSERT INTO INVITEM VALUES (1001, 102, 1);
+INSERT INTO INVITEM VALUES (1002, 103, 5);
+INSERT INTO INVITEM VALUES (1003, 104, 3);
+INSERT INTO INVITEM VALUES (1004, 105, 1);
+```
+
+
+### ii. Displaying Item Name and Quantity Sold
+
+
+```sql
+SELECT itemname, SUM(quantity) AS total_quantity_sold
+FROM ITEM
+JOIN INVITEM ON ITEM.itemno = INVITEM.itemno
+GROUP BY itemname;
+```
+
+
+### iii. Displaying Item Name and Price as Single Column
+
+
+```sql
+SELECT CONCAT(itemname, ' price is ', itemprice) AS item_price
+FROM ITEM;
+```
+
+
+### iv. Displaying Invoices, Customer Name, and Item Names Together
+
+
+```sql
+SELECT INVOICE.invno, CUSTOMER.custname, ITEM.itemname
+FROM INVOICE
+JOIN CUSTOMER ON INVOICE.custno = CUSTOMER.custno
+JOIN INVITEM ON INVOICE.invno = INVITEM.invno
+JOIN ITEM ON INVITEM.itemno = ITEM.itemno;
+```
+
+
+### v. PL/SQL Procedure to Calculate and Print Employee Pay Slip
+
+
+```sql
+CREATE OR REPLACE PROCEDURE calculate_employee_pay_slip (emp_id IN INT) AS
+    emp_salary INT;
+    emp_bonus INT;
+    total_pay INT;
+BEGIN
+    -- Retrieve employee salary and bonus based on emp_id
+    SELECT salary, bonus INTO emp_salary, emp_bonus
+    FROM employees
+    WHERE employee_id = emp_id;
+
+
+    -- Calculate total pay
+    total_pay := emp_salary + emp_bonus;
+
+
+    -- Print pay slip
+    DBMS_OUTPUT.PUT_LINE('Employee ID: ' || emp_id);
+    DBMS_OUTPUT.PUT_LINE('Salary: ' || emp_salary);
+    DBMS_OUTPUT.PUT_LINE('Bonus: ' || emp_bonus);
+    DBMS_OUTPUT.PUT_LINE('Total Pay: ' || total_pay);
+END;
+/
+```
+
+
+This PL/SQL procedure can be called with an employee ID to calculate and print the pay slip for that employee.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9)
+9. Consider the following database for a banking enterprise.
+BRANCH(branch_name, branch_city, assets) ACCOUNT(accno, branch_name, balance) DEPOSITOR(customer_name, accno) CUSTOMER(customer_name, customer_street, customer_city) LOAN(loan_number, branch_name, amount) BORROWER( customer_name, loan_number)
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation.
+ii. Display all the customers who were depositor and borrower.
+iii. Display all the customer name who are only depositor. 
+iv. Display all branch name whose assets are greater than assets of branches located in “Coimbatore” city.
+v.Write a PL/SQL to handle user defined exception. 
+
+
+Solution
+
+
+### i. Creating Tables and Entering Data
+
+
+```sql
+CREATE TABLE BRANCH (
+    branch_name VARCHAR(50) PRIMARY KEY,
+    branch_city VARCHAR(50),
+    assets DECIMAL(10, 2)
+);
+
+
+INSERT INTO BRANCH VALUES ('Branch A', 'New York', 1000000.00);
+INSERT INTO BRANCH VALUES ('Branch B', 'Los Angeles', 750000.00);
+INSERT INTO BRANCH VALUES ('Branch C', 'Chicago', 900000.00);
+INSERT INTO BRANCH VALUES ('Branch D', 'Houston', 850000.00);
+INSERT INTO BRANCH VALUES ('Branch E', 'Coimbatore', 600000.00);
+
+
+CREATE TABLE ACCOUNT (
+    accno INT PRIMARY KEY,
+    branch_name VARCHAR(50),
+    balance DECIMAL(10, 2),
+    FOREIGN KEY (branch_name) REFERENCES BRANCH(branch_name)
+);
+
+
+INSERT INTO ACCOUNT VALUES (1001, 'Branch A', 50000.00);
+INSERT INTO ACCOUNT VALUES (1002, 'Branch B', 75000.00);
+INSERT INTO ACCOUNT VALUES (1003, 'Branch C', 60000.00);
+INSERT INTO ACCOUNT VALUES (1004, 'Branch D', 45000.00);
+INSERT INTO ACCOUNT VALUES (1005, 'Branch E', 30000.00);
+
+
+CREATE TABLE CUSTOMER (
+    customer_name VARCHAR(50) PRIMARY KEY,
+    customer_street VARCHAR(50),
+    customer_city VARCHAR(50)
+);
+
+
+INSERT INTO CUSTOMER VALUES ('Alice', '123 Main St', 'New York');
+INSERT INTO CUSTOMER VALUES ('Bob', '456 Oak Rd', 'Los Angeles');
+INSERT INTO CUSTOMER VALUES ('Charlie', '789 Elm St', 'Chicago');
+INSERT INTO CUSTOMER VALUES ('David', '321 Pine Ave', 'Houston');
+INSERT INTO CUSTOMER VALUES ('Eve', '654 Maple Blvd', 'Coimbatore');
+
+
+CREATE TABLE DEPOSITOR (
+    customer_name VARCHAR(50),
+    accno INT,
+    PRIMARY KEY (customer_name, accno),
+    FOREIGN KEY (customer_name) REFERENCES CUSTOMER(customer_name),
+    FOREIGN KEY (accno) REFERENCES ACCOUNT(accno)
+);
+
+
+INSERT INTO DEPOSITOR VALUES ('Alice', 1001);
+INSERT INTO DEPOSITOR VALUES ('Bob', 1002);
+INSERT INTO DEPOSITOR VALUES ('Charlie', 1003);
+INSERT INTO DEPOSITOR VALUES ('David', 1004);
+INSERT INTO DEPOSITOR VALUES ('Eve', 1005);
+
+
+CREATE TABLE LOAN (
+    loan_number INT PRIMARY KEY,
+    branch_name VARCHAR(50),
+    amount DECIMAL(10, 2),
+    FOREIGN KEY (branch_name) REFERENCES BRANCH(branch_name)
+);
+
+
+INSERT INTO LOAN VALUES (101, 'Branch A', 100000.00);
+INSERT INTO LOAN VALUES (102, 'Branch B', 150000.00);
+INSERT INTO LOAN VALUES (103, 'Branch C', 120000.00);
+INSERT INTO LOAN VALUES (104, 'Branch D', 90000.00);
+INSERT INTO LOAN VALUES (105, 'Branch E', 80000.00);
+
+
+CREATE TABLE BORROWER (
+    customer_name VARCHAR(50),
+    loan_number INT,
+    PRIMARY KEY (customer_name, loan_number),
+    FOREIGN KEY (customer_name) REFERENCES CUSTOMER(customer_name),
+    FOREIGN KEY (loan_number) REFERENCES LOAN(loan_number)
+);
+
+
+INSERT INTO BORROWER VALUES ('Alice', 101);
+INSERT INTO BORROWER VALUES ('Bob', 102);
+INSERT INTO BORROWER VALUES ('Charlie', 103);
+INSERT INTO BORROWER VALUES ('David', 104);
+INSERT INTO BORROWER VALUES ('Eve', 105);
+```
+
+
+### ii. Displaying Customers Who Were Depositor and Borrower
+
+
+```sql
+SELECT DISTINCT CUSTOMER.customer_name
+FROM CUSTOMER
+JOIN DEPOSITOR ON CUSTOMER.customer_name = DEPOSITOR.customer_name
+JOIN BORROWER ON CUSTOMER.customer_name = BORROWER.customer_name;
+```
+
+
+### iii. Displaying Customers Who Are Only Depositor
+
+
+```sql
+SELECT CUSTOMER.customer_name
+FROM CUSTOMER
+JOIN DEPOSITOR ON CUSTOMER.customer_name = DEPOSITOR.customer_name
+WHERE CUSTOMER.customer_name NOT IN (
+    SELECT BORROWER.customer_name
+    FROM BORROWER
+);
+```
+
+
+### iv. Displaying Branches with Assets Greater Than Coimbatore Branches
+
+
+```sql
+SELECT BRANCH.branch_name
+FROM BRANCH
+WHERE BRANCH.assets > (
+    SELECT assets
+    FROM BRANCH
+    WHERE branch_city = 'Coimbatore'
+);
+```
+
+
+### v. PL/SQL to Handle User-Defined Exception
+
+
+```sql
+CREATE OR REPLACE PROCEDURE handle_user_exception (emp_id IN INT) AS
+    emp_salary INT;
+    emp_bonus INT;
+    total_pay INT;
+    insufficient_balance EXCEPTION;
+BEGIN
+    -- Retrieve employee salary and bonus based on emp_id
+    SELECT salary, bonus INTO emp_salary, emp_bonus
+    FROM employees
+    WHERE employee_id = emp_id;
+
+
+    -- Calculate total pay
+    total_pay := emp_salary + emp_bonus;
+
+
+    -- Check if total pay exceeds account balance
+    IF total_pay > account_balance THEN
+        RAISE insufficient_balance;
+    END IF;
+
+
+    -- Print pay slip
+    DBMS_OUTPUT.PUT_LINE('Employee ID: ' || emp_id);
+    DBMS_OUTPUT.PUT_LINE('Salary: ' || emp_salary);
+    DBMS_OUTPUT.PUT_LINE('Bonus: ' || emp_bonus);
+    DBMS_OUTPUT.PUT_LINE('Total Pay: ' || total_pay);
+EXCEPTION
+    WHEN insufficient_balance THEN
+        DBMS_OUTPUT.PUT_LINE('Error: Insufficient account balance to process payroll.');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An unexpected error occurred.');
+END;
+/
+```
+
+
+
+
+
+
+10)
+
+
+10. Consider the employee databases.
+EMPLOYEE(empname, street, city)
+WORKS(empname, companyname, salary)
+COMPANY(companyname, city)
+Manages(empname, managername)
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation.
+ii. Find the names of all employees work for ‘First bank corporation’.
+iii. Find the names,street addresses and cities of residence of all employees who work for ‘First bank corporation’ and earn more than 200000 per annum.
+iv. Find the names of all employees in this database who live in the same city as the companies for which they work.
+v.Write a PL/SQL to calculate Electricity bill using function.
+
+
+
+
+
+
+Solution
+
+
+### i. Creating Tables and Entering Data
+
+
+```sql
+CREATE TABLE EMPLOYEE (
+    empname VARCHAR(50) PRIMARY KEY,
+    street VARCHAR(50),
+    city VARCHAR(50)
+);
+
+
+INSERT INTO EMPLOYEE VALUES ('Alice', '123 Main St', 'New York');
+INSERT INTO EMPLOYEE VALUES ('Bob', '456 Oak Rd', 'Los Angeles');
+INSERT INTO EMPLOYEE VALUES ('Charlie', '789 Elm St', 'Chicago');
+INSERT INTO EMPLOYEE VALUES ('David', '321 Pine Ave', 'Houston');
+INSERT INTO EMPLOYEE VALUES ('Eve', '654 Maple Blvd', 'Miami');
+
+
+CREATE TABLE WORKS (
+    empname VARCHAR(50),
+    companyname VARCHAR(50),
+    salary DECIMAL(10, 2),
+    PRIMARY KEY (empname, companyname),
+    FOREIGN KEY (empname) REFERENCES EMPLOYEE(empname),
+    FOREIGN KEY (companyname) REFERENCES COMPANY(companyname)
+);
+
+
+INSERT INTO WORKS VALUES ('Alice', 'First Bank Corporation', 250000.00);
+INSERT INTO WORKS VALUES ('Bob', 'Second Bank Inc.', 180000.00);
+INSERT INTO WORKS VALUES ('Charlie', 'First Bank Corporation', 220000.00);
+INSERT INTO WORKS VALUES ('David', 'Tech Solutions', 150000.00);
+INSERT INTO WORKS VALUES ('Eve', 'First Bank Corporation', 210000.00);
+
+
+CREATE TABLE COMPANY (
+    companyname VARCHAR(50) PRIMARY KEY,
+    city VARCHAR(50)
+);
+
+
+INSERT INTO COMPANY VALUES ('First Bank Corporation', 'New York');
+INSERT INTO COMPANY VALUES ('Second Bank Inc.', 'Los Angeles');
+INSERT INTO COMPANY VALUES ('Tech Solutions', 'Chicago');
+INSERT INTO COMPANY VALUES ('Innovate Inc.', 'Houston');
+INSERT INTO COMPANY VALUES ('Global Services', 'Miami');
+
+
+CREATE TABLE MANAGES (
+    empname VARCHAR(50),
+    managername VARCHAR(50),
+    PRIMARY KEY (empname, managername),
+    FOREIGN KEY (empname) REFERENCES EMPLOYEE(empname)
+);
+
+
+INSERT INTO MANAGES VALUES ('Alice', 'Bob');
+INSERT INTO MANAGES VALUES ('Charlie', 'David');
+INSERT INTO MANAGES VALUES ('David', 'Eve');
+INSERT INTO MANAGES VALUES ('Eve', 'Alice');
+INSERT INTO MANAGES VALUES ('Bob', 'Charlie');
+```
+
+
+### ii. Finding Employees Working for 'First Bank Corporation'
+
+
+```sql
+SELECT empname
+FROM WORKS
+WHERE companyname = 'First Bank Corporation';
+```
+
+
+### iii. Finding Employees Working for 'First Bank Corporation' and Earning More Than 200000
+
+
+```sql
+SELECT empname, street, city
+FROM EMPLOYEE
+JOIN WORKS ON
+
+
+
+
+
+
+
+
+
+
+11)
+11. Consider the following employee and department tables.
+EMPLOYEE(empno, ename, designation, manager, hiredate, salary, commission, deptno)
+DEPARTMENT(deptno, dname, location)
+i. Create the above tables by properly specifying the primary keys and foreign keys and Enter at least five tuples for each relation.
+ii. List the employees who annual salary is between 22000 and 25000
+iii. List the employees names along with their manager names.
+iv. List the dept who employees maximum no of ‘CLERK’s.
+v.  Write a trigger to ensure that salary of an employee is always greater than the commission
+
+
+
+
+
+
+Solution
+
+
+### i. Creating Tables and Entering Data
+
+
+```sql
+CREATE TABLE EMPLOYEE (
+    empno INT PRIMARY KEY,
+    ename VARCHAR(50),
+    designation VARCHAR(50),
+    manager VARCHAR(50),
+    hiredate DATE,
+    salary DECIMAL(10, 2),
+    commission DECIMAL(10, 2),
+    deptno INT,
+    FOREIGN KEY (deptno) REFERENCES DEPARTMENT(deptno)
+);
+
+
+INSERT INTO EMPLOYEE VALUES (101, 'Alice', 'Manager', 'Bob', '2020-01-01', 25000.00, 2000.00, 1);
+INSERT INTO EMPLOYEE VALUES (102, 'Bob', 'Director', 'Charlie', '2018-05-15', 35000.00, 3000.00, 1);
+INSERT INTO EMPLOYEE VALUES (103, 'Charlie', 'VP', 'David', '2015-09-01', 45000.00, 4000.00, 2);
+INSERT INTO EMPLOYEE VALUES (104, 'David', 'CEO', NULL, '2012-03-01', 55000.00, 5000.00, 2);
+INSERT INTO EMPLOYEE VALUES (105, 'Eve', 'Clerk', 'Alice', '2021-07-01', 23000.00, 1500.00, 3);
+
+
+CREATE TABLE DEPARTMENT (
+    deptno INT PRIMARY KEY,
+    dname VARCHAR(50),
+    location VARCHAR(50)
+);
+
+
+INSERT INTO DEPARTMENT VALUES (1, 'Finance', 'New York');
+INSERT INTO DEPARTMENT VALUES (2, 'HR', 'Los Angeles');
+INSERT INTO DEPARTMENT VALUES (3, 'IT', 'Chicago');
+INSERT INTO DEPARTMENT VALUES (4, 'Marketing', 'Houston');
+INSERT INTO DEPARTMENT VALUES (5, 'Operations', 'Miami');
+```
+
+
+### ii. Listing Employees with Annual Salary Between 22000 and 25000
+
+
+```sql
+SELECT ename, salary * 12 AS annual_salary
+FROM EMPLOYEE
+WHERE salary * 12 BETWEEN 22000 AND 25000;
+```
+
+
+### iii. Listing Employees and Their Manager Names
+
+
+```sql
+SELECT e.ename AS employee_name, m.ename AS manager_name
+FROM EMPLOYEE e
+LEFT JOIN EMPLOYEE m ON e.manager = m.ename;
+```
+
+
+### iv. Listing the Department with the Maximum Number of Clerks
+
+
+```sql
+SELECT d.dname, COUNT(*) AS num_clerks
+FROM EMPLOYEE e
+JOIN DEPARTMENT d ON e.deptno = d.deptno
+WHERE e.designation = 'Clerk'
+GROUP BY d.dname
+ORDER BY num_clerks DESC
+LIMIT 1;
+```
+
+
+### v. Trigger to Ensure Salary is Greater Than Commission
+
+
+```sql
+CREATE TRIGGER ensure_salary_greater_than_commission
+BEFORE INSERT OR UPDATE ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+    IF NEW.salary <= NEW.commission THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Salary must be greater than commission.';
+    END IF;
+END;
+/
+```
+
+
+This trigger will fire before any insert or update operation on the EMPLOYEE table, and it will raise an exception if the new salary is less than or equal to the new commission.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+12)
+12. Consider the following company database.
+EMPLOYEE(eno, name, dob, doj, designation, basicpay, deptno)
+DEPARTMENT(deptno, name)
+PROJECT(projno, name, deptno)
+WORKSFOR(eno, projno, hours)
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation.
+ii. List the department number and the number of employees in each department.
+iii. List the details of employees who have worked in more than three projects on a day. 
+iv. Develop a view that will keep track of the department number, the number of employees
+in the department and the total basic pay expenditure for each department.
+v. Write a PL/SQL to check whether the given number is Armstrong number or not. 
+
+
+
+
+
+
+Solution
+
+
+
+
+### i. Creating Tables and Entering Data
+
+
+```sql
+CREATE TABLE EMPLOYEE (
+    eno INT PRIMARY KEY,
+    name VARCHAR(50),
+    dob DATE,
+    doj DATE,
+    designation VARCHAR(50),
+    basicpay DECIMAL(10, 2),
+    deptno INT,
+    FOREIGN KEY (deptno) REFERENCES DEPARTMENT(deptno)
+);
+
+
+INSERT INTO EMPLOYEE VALUES (101, 'Alice', '1990-05-15', '2015-07-01', 'Manager', 50000.00, 1);
+INSERT INTO EMPLOYEE VALUES (102, 'Bob', '1988-10-20', '2010-03-15', 'Engineer', 40000.00, 2);
+INSERT INTO EMPLOYEE VALUES (103, 'Charlie', '1995-02-28', '2018-09-10', 'Analyst', 35000.00, 1);
+INSERT INTO EMPLOYEE VALUES (104, 'David', '1985-12-10', '2005-06-20', 'Technician', 30000.00, 2);
+INSERT INTO EMPLOYEE VALUES (105, 'Eve', '1992-08-05', '2016-11-30', 'Clerk', 25000.00, 3);
+
+
+CREATE TABLE DEPARTMENT (
+    deptno INT PRIMARY KEY,
+    name VARCHAR(50)
+);
+
+
+INSERT INTO DEPARTMENT VALUES (1, 'Finance');
+INSERT INTO DEPARTMENT VALUES (2, 'HR');
+INSERT INTO DEPARTMENT VALUES (3, 'IT');
+INSERT INTO DEPARTMENT VALUES (4, 'Marketing');
+INSERT INTO DEPARTMENT VALUES (5, 'Operations');
+
+
+CREATE TABLE PROJECT (
+    projno INT PRIMARY KEY,
+    name VARCHAR(50),
+    deptno INT,
+    FOREIGN KEY (deptno) REFERENCES DEPARTMENT(deptno)
+);
+
+
+INSERT INTO PROJECT VALUES (1001, 'Project A', 1);
+INSERT INTO PROJECT VALUES (1002, 'Project B', 2);
+INSERT INTO PROJECT VALUES (1003, 'Project C', 1);
+INSERT INTO PROJECT VALUES (1004, 'Project D', 2);
+INSERT INTO PROJECT VALUES (1005, 'Project E', 3);
+
+
+CREATE TABLE WORKSFOR (
+    eno INT,
+    projno INT,
+    hours INT,
+    PRIMARY KEY (eno, projno),
+    FOREIGN KEY (eno) REFERENCES EMPLOYEE(eno),
+    FOREIGN KEY (projno) REFERENCES PROJECT(projno)
+);
+
+
+INSERT INTO WORKSFOR VALUES (101, 1001, 40);
+INSERT INTO WORKSFOR VALUES (102, 1002, 35);
+INSERT INTO WORKSFOR VALUES (103, 1003, 45);
+INSERT INTO WORKSFOR VALUES (104, 1004, 30);
+INSERT INTO WORKSFOR VALUES (105, 1005, 50);
+```
+
+
+### ii. Listing Department Number and Number of Employees
+
+
+```sql
+SELECT deptno, COUNT(*) AS num_employees
+FROM EMPLOYEE
+GROUP BY deptno;
+```
+
+
+### iii. Listing Employees Who Worked in More Than Three Projects on a Day
+
+
+This query requires additional information about the structure of the database to accurately determine the employees who worked in more than three projects on a specific day.
+
+
+### iv. Developing a View for Department Details
+
+
+```sql
+CREATE VIEW DepartmentDetails AS
+SELECT d.deptno, COUNT(e.eno) AS num_employees, SUM(e.basicpay) AS total_basic_pay
+FROM DEPARTMENT d
+LEFT JOIN EMPLOYEE e ON d.deptno = e.deptno
+GROUP BY d.deptno;
+```
+
+
+### v. PL/SQL to Check if a Number is an Armstrong Number
+
+
+```sql
+DECLARE
+    n NUMBER := 153;
+    s NUMBER := 0;
+    t NUMBER := n;
+BEGIN
+    WHILE t > 0 LOOP
+        s := s + POWER((t MOD 10), 3);
+        t := TRUNC(t / 10);
+    END LOOP;
+    
+    IF s = n THEN
+        DBMS_OUTPUT.PUT_LINE('The Given Number ' || n || ' is an Armstrong Number');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('The Given Number ' || n || ' is Not an Armstrong Number');
+    END IF;
+END;
+```
+
+
+This PL/SQL program checks whether the given number is an Armstrong number or not.
+
+
+
+
+13. Consider the following employee and department tables.
+EMPLOYEE(empno, ename, designation, manager, hiredate, salary, commission, deptno)
+DEPARTMENT(deptno, dname, location)
+i. Create the above tables by properly specifying the primary keys and foreign keys and enter at least five tuples for each relation.
+ii. List the employees whose salary is greater than at least one of the employees of deptno 30 .
+iii. List the name, job, salary of employees in the department with the highest average salary.
+iv. List the employees who are working either as manager or analyst with salary ranging from
+2000 and 5000 .
+v. Write a trigger to ensure that no DML operations are allowed on employee table.
+
+
+Solution
+
+
+### i. Creating Tables and Entering Data
+
+
+```sql
+CREATE TABLE EMPLOYEE (
+    empno INT PRIMARY KEY,
+    ename VARCHAR(50),
+    designation VARCHAR(50),
+    manager INT,
+    hiredate DATE,
+    salary DECIMAL(10, 2),
+    commission DECIMAL(10, 2),
+    deptno INT,
+    FOREIGN KEY (deptno) REFERENCES DEPARTMENT(deptno)
+);
+
+
+INSERT INTO EMPLOYEE VALUES (101, 'Alice', 'Manager', NULL, '2010-01-15', 6000.00, 1000.00, 10);
+INSERT INTO EMPLOYEE VALUES (102, 'Bob', 'Analyst', 101, '2012-03-20', 4000.00, 500.00, 20);
+INSERT INTO EMPLOYEE VALUES (103, 'Charlie', 'Clerk', 101, '2015-05-10', 3000.00, 200.00, 30);
+INSERT INTO EMPLOYEE VALUES (104, 'David', 'Manager', NULL, '2008-07-01', 7000.00, 1200.00, 20);
+INSERT INTO EMPLOYEE VALUES (105, 'Eve', 'Analyst', 104, '2017-09-30', 4500.00, 600.00, 30);
+
+
+CREATE TABLE DEPARTMENT (
+    deptno INT PRIMARY KEY,
+    dname VARCHAR(50),
+    location VARCHAR(50)
+);
+
+
+INSERT INTO DEPARTMENT VALUES (10, 'Finance', 'New York');
+INSERT INTO DEPARTMENT VALUES (20, 'HR', 'Los Angeles');
+INSERT INTO DEPARTMENT VALUES (30, 'IT', 'Chicago');
+INSERT INTO DEPARTMENT VALUES (40, 'Marketing', 'Houston');
+INSERT INTO DEPARTMENT VALUES (50, 'Operations', 'Miami');
+```
+
+
+### ii. Listing Employees with Salary Greater Than at Least One Employee in Deptno 30
+
+
+```sql
+SELECT *
+FROM EMPLOYEE
+WHERE salary > ANY (SELECT salary FROM EMPLOYEE WHERE deptno = 30);
+```
+
+
+### iii. Listing Name, Job, and Salary of Employees in Department with Highest Average Salary
+
+
+```sql
+SELECT ename, designation, salary
+FROM EMPLOYEE
+WHERE deptno = (
+    SELECT deptno
+    FROM (
+        SELECT deptno, AVG(salary) AS avg_salary
+        FROM EMPLOYEE
+        GROUP BY deptno
+        ORDER BY avg_salary DESC
+        LIMIT 1
+    ) AS highest_avg_salary
+);
+```
+
+
+### iv. Listing Employees Working as Manager or Analyst with Salary Between 2000 and 5000
+
+
+```sql
+SELECT *
+FROM EMPLOYEE
+WHERE (designation = 'Manager' OR designation = 'Analyst') AND salary BETWEEN 2000 AND 5000;
+```
+
+
+### v. Trigger to Prevent DML Operations on Employee Table
+
+
+```sql
+CREATE OR REPLACE TRIGGER prevent_dml_employee
+BEFORE INSERT OR UPDATE OR DELETE ON EMPLOYEE
+BEGIN
+    RAISE_APPLICATION_ERROR(-20001, 'DML operations are not allowed on the Employee table.');
+END;
+/
+```
+
+
+This trigger will prevent any DML (Data Manipulation Language) operations (INSERT, UPDATE, DELETE) on the EMPLOYEE table by raising an application error when such operations are attempted.
+
+
+14. Consider the following relations for a transport management system application:
+BUS (ROUTENO, SOURCE, DESTINATION)
+DRIVER (DID, DNAME, DOB, GENDER)
+ASSIGN_ROUTE (DID, ROUTENO, JOURNEY_DATE)
+i. The primary keys are underlined. Identify the foreign keys and draw schema diagram
+ii. Create the above mentioned tables and populate the tables 
+Note: Read all questions and populate values accordingly.
+iii. Include constraints that the routeNo starts with letter 'R' and gender of driver is always
+'Male'
+iv. Develop a SQL query to list the details of drivers who have traveled more than three
+times on the same route
+v. Write PL/SQL program to check given number is odd or even.
+ 
+Solution
+
+
+### i. Identifying Foreign Keys and Drawing Schema Diagram
+
+
+The primary keys are underlined:
+
+
+- **BUS** (ROUTENO, SOURCE, DESTINATION)
+- **DRIVER** (DID, DNAME, DOB, GENDER)
+- **ASSIGN_ROUTE** (DID, ROUTENO, JOURNEY_DATE)
+
+
+The foreign keys are:
+
+
+- **ASSIGN_ROUTE** (DID) references **DRIVER** (DID)
+- **ASSIGN_ROUTE** (ROUTENO) references **BUS** (ROUTENO)
+
+
+Schema Diagram:
+```
++---------------+
+|  BUS         |
++---------------+
+| ROUTENO      |
+| SOURCE        |
+| DESTINATION  |
++---------------+
+
+
++---------------+
+|  DRIVER      |
++---------------+
+| DID          |
+| DNAME        |
+| DOB          |
+| GENDER       |
++---------------+
+
+
++---------------+
+|  ASSIGN_ROUTE |
++---------------+
+| DID          |
+| ROUTENO      |
+| JOURNEY_DATE |
++---------------+
+```
+
+
+### ii. Creating Tables and Populating Data
+
+
+```sql
+CREATE TABLE BUS (
+    ROUTENO VARCHAR(50) PRIMARY KEY,
+    SOURCE VARCHAR(50),
+    DESTINATION VARCHAR(50)
+);
+
+
+CREATE TABLE DRIVER (
+    DID INT PRIMARY KEY,
+    DNAME VARCHAR(50),
+    DOB DATE,
+    GENDER VARCHAR(10) CHECK (GENDER = 'Male')
+);
+
+
+CREATE TABLE ASSIGN_ROUTE (
+    DID INT,
+    ROUTENO VARCHAR(50),
+    JOURNEY_DATE DATE,
+    PRIMARY KEY (DID, ROUTENO),
+    FOREIGN KEY (DID) REFERENCES DRIVER(DID),
+    FOREIGN KEY (ROUTENO) REFERENCES BUS(ROUTENO)
+);
+
+
+INSERT INTO BUS VALUES ('R101', 'New York', 'Los Angeles');
+INSERT INTO BUS VALUES ('R102', 'Chicago', 'Houston');
+INSERT INTO BUS VALUES ('R103', 'Miami', 'San Francisco');
+
+
+INSERT INTO DRIVER VALUES (1, 'Alice', '1990-01-01', 'Male');
+INSERT INTO DRIVER VALUES (2, 'Bob', '1985-06-15', 'Male');
+INSERT INTO DRIVER VALUES (3, 'Charlie', '1992-03-20', 'Male');
+
+
+INSERT INTO ASSIGN_ROUTE VALUES (1, 'R101', '2022-01-01');
+INSERT INTO ASSIGN_ROUTE VALUES (1, 'R101', '2022-01-15');
+INSERT INTO ASSIGN_ROUTE VALUES (1, 'R101', '2022-02-01');
+INSERT INTO ASSIGN_ROUTE VALUES (2, 'R102', '2022-02-15');
+INSERT INTO ASSIGN_ROUTE VALUES (2, 'R102', '2022-03-01');
+INSERT INTO ASSIGN_ROUTE VALUES (3, 'R103', '2022-03-15');
+```
+
+
+### iii. Constraints and SQL Query
+
+
+To ensure that routeNo starts with the letter 'R', we can use a check constraint:
+
+
+```sql
+ALTER TABLE BUS
+ADD CONSTRAINT route_no_check CHECK (ROUTENO LIKE 'R%');
+```
+
+
+To list the details of drivers who have traveled more than three times on the same route, we can use the following SQL query:
+
+
+```sql
+SELECT D.DNAME, COUNT(*) AS num_journeys
+FROM ASSIGN_ROUTE AR
+JOIN DRIVER D ON AR.DID = D.DID
+GROUP BY D.DNAME
+HAVING COUNT(*) > 3;
+```
+
+
+### iv. PL/SQL Program to Check if a Number is Odd or Even
+
+
+```sql
+DECLARE
+    n NUMBER := 5;
+BEGIN
+    IF MOD(n, 2) = 0 THEN
+        DBMS_OUTPUT.PUT_LINE(n || ' is even');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE(n || ' is odd');
+    END IF;
+END;
+```
+
+
+This PL/SQL program checks if the given number is odd or even by using the MOD function, which returns the remainder of the division of the number by 2. If the remainder is 0, the number is even; otherwise, it is odd.
+
+
+
+
+
+
+
+
+
+
+ 
+15. Consider the following relations for a transport management system application:
+DRIVER (DCODE, DNAME, DOB, GENDER)
+CITY (CCODE, CNAME)
+TRUCK (TRUCKCODE, TTYPE)
+TTYPE can take two values (‘L’,’H’)
+L-Light , H- Heavy
+Each truck is assigned a unique truck code. There can be many trucks belonging to the same truck type.
+DRIVE_TRUCK (TRUCKCODE, DCODE, DOT, CCODE)
+DOT – Date of Trip
+i. The primary keys are underlined. Identify the foreign keys and draw schema diagram
+ii. Create the above mentioned tables and populate the tables
+iii. Include the constraint as mentioned above and the gender of driver is always 'male'.
+iv. Develop a SQL query to list the details of each driver and the number of trips traveled.
+v.  Create a view that displays the Driver details and also the city in which he drives a truck
+ 
+
+
+Solution
+
+
+### i. Identifying Foreign Keys and Drawing Schema Diagram
+
+
+The primary keys are underlined:
+
+
+- **DRIVER** (DCODE, DNAME, DOB, GENDER)
+- **CITY** (CCODE, CNAME)
+- **TRUCK** (TRUCKCODE, TTYPE)
+- **DRIVE_TRUCK** (TRUCKCODE, DCODE, DOT, CCODE)
+
+
+The foreign keys are:
+
+
+- **DRIVE_TRUCK** (TRUCKCODE) references **TRUCK** (TRUCKCODE)
+- **DRIVE_TRUCK** (DCODE) references **DRIVER** (DCODE)
+- **DRIVE_TRUCK** (CCODE) references **CITY** (CCODE)
+
+
+Schema Diagram:
+```
++---------------+
+|  DRIVER      |
++---------------+
+| DCODE        |
+| DNAME        |
+| DOB          |
+| GENDER       |
++---------------+
+
+
++---------------+
+|  CITY        |
++---------------+
+| CCODE        |
+| CNAME        |
++---------------+
+
+
++---------------+
+|  TRUCK       |
++---------------+
+| TRUCKCODE    |
+| TTYPE        |
++---------------+
+
+
++---------------+
+|  DRIVE_TRUCK  |
++---------------+
+| TRUCKCODE    |
+| DCODE        |
+| DOT          |
+| CCODE        |
++---------------+
+```
+
+
+### ii. Creating Tables and Populating Data
+
+
+```sql
+CREATE TABLE DRIVER (
+    DCODE INT PRIMARY KEY,
+    DNAME VARCHAR(50),
+    DOB DATE,
+    GENDER VARCHAR(10) CHECK (GENDER = 'Male')
+);
+
+
+CREATE TABLE CITY (
+    CCODE INT PRIMARY KEY,
+    CNAME VARCHAR(50)
+);
+
+
+CREATE TABLE TRUCK (
+    TRUCKCODE INT PRIMARY KEY,
+    TTYPE VARCHAR(1) CHECK (TTYPE IN ('L', 'H'))
+);
+
+
+CREATE TABLE DRIVE_TRUCK (
+    TRUCKCODE INT,
+    DCODE INT,
+    DOT DATE,
+    CCODE INT,
+    PRIMARY KEY (TRUCKCODE, DCODE),
+    FOREIGN KEY (TRUCKCODE) REFERENCES TRUCK(TRUCKCODE),
+    FOREIGN KEY (DCODE) REFERENCES DRIVER(DCODE),
+    FOREIGN KEY (CCODE) REFERENCES CITY(CCODE)
+);
+
+
+INSERT INTO DRIVER VALUES (1, 'Alice', '1990-01-01', 'Male');
+INSERT INTO DRIVER VALUES (2, 'Bob', '1985-06-15', 'Male');
+INSERT INTO DRIVER VALUES (3, 'Charlie', '1992-03-20', 'Male');
+
+
+INSERT INTO CITY VALUES (1, 'New York');
+INSERT INTO CITY VALUES (2, 'Los Angeles');
+INSERT INTO CITY VALUES (3, 'Chicago');
+
+
+INSERT INTO TRUCK VALUES (1, 'L');
+INSERT INTO TRUCK VALUES (2, 'H');
+INSERT INTO TRUCK VALUES (3, 'L');
+
+
+INSERT INTO DRIVE_TRUCK VALUES (1, 1, '2022-01-01', 1);
+INSERT INTO DRIVE_TRUCK VALUES (1, 1, '2022-01-15', 1);
+INSERT INTO DRIVE_TRUCK VALUES (2, 2, '2022-02-01', 2);
+INSERT INTO DRIVE_TRUCK VALUES (2, 2, '2022-02-15', 2);
+INSERT INTO DRIVE_TRUCK VALUES (3, 3, '2022-03-01', 3);
+```
+
+
+### iii. Constraints and SQL Query
+
+
+To ensure that the gender of the driver is always 'male', we can use a check constraint:
+
+
+```sql
+ALTER TABLE DRIVER
+ADD CONSTRAINT gender_check CHECK (GENDER = 'Male');
+```
+
+
+To list the details of each driver and the number of trips traveled, we can use the following SQL query:
+
+
+```sql
+SELECT D.DNAME, COUNT(*) AS num_trips
+FROM DRIVE_TRUCK DT
+JOIN DRIVER D ON DT.DCODE = D.DCODE
+GROUP BY D.DNAME;
+```
+
+
+### iv. View to Display Driver Details and City
+
+
+```sql
+CREATE VIEW driver_city AS
+SELECT D.DNAME, C.CNAME
+FROM DRIVE_TRUCK DT
+JOIN DRIVER D ON DT.DCODE = D.DCODE
+JOIN CITY C ON DT.CCODE = C.CCODE;
+```
+
+
+This view displays the driver's name and the city in which he drives a truck.
+
+
+ 
+ 
+16. Consider the following relational schema for Products Order database application:
+Products (p_id, p_name, retail_price, qty_on_hand)
+Orders (order_id, order_date)
+Order_details (order_number, product_number, qty_ordered)
+Where: order_number references order_id  product_number references p_id
+i. The primary keys are underlined. Identify the foreign keys and draw schema diagram
+ii. Create the above mentioned tables and populate the tables 
+iii. Include the constraint on orderid that it starts with letter ‘O’. 
+iv. Display the ProdID and the sum of quantity ordered for each product.
+v. Create a view that keeps track of P_id, price, order_id, qty_ordered and ordered_date.
+vi. Create a database TRIGGER, which deletes the order from Orders table, AFTER the deletion of corresponding order_number in Order_details.
+ 
+ 
+Solution
+
+
+### i. Identifying Foreign Keys and Drawing Schema Diagram
+
+
+The primary keys are underlined:
+
+
+- **Products** (p_id, p_name, retail_price, qty_on_hand)
+- **Orders** (order_id, order_date)
+- **Order_details** (order_number, product_number, qty_ordered)
+
+
+The foreign keys are:
+
+
+- **Order_details** (order_number) references **Orders** (order_id)
+- **Order_details** (product_number) references **Products** (p_id)
+
+
+Schema Diagram:
+```
++---------------+
+|  Products     |
++---------------+
+| p_id          |
+| p_name        |
+| retail_price  |
+| qty_on_hand   |
++---------------+
+
+
++---------------+
+|  Orders       |
++---------------+
+| order_id      |
+| order_date    |
++---------------+
+
+
++----------------+
+|  Order_details  |
++----------------+
+| order_number   |
+| product_number |
+| qty_ordered    |
++----------------+
+```
+
+
+### ii. Creating Tables and Populating Data
+
+
+```sql
+CREATE TABLE Products (
+    p_id INT PRIMARY KEY,
+    p_name VARCHAR(50),
+    retail_price DECIMAL(10, 2),
+    qty_on_hand INT
+);
+
+
+CREATE TABLE Orders (
+    order_id VARCHAR(10) PRIMARY KEY,
+    order_date DATE
+);
+
+
+CREATE TABLE Order_details (
+    order_number VARCHAR(10),
+    product_number INT,
+    qty_ordered INT,
+    PRIMARY KEY (order_number, product_number),
+    FOREIGN KEY (order_number) REFERENCES Orders(order_id),
+    FOREIGN KEY (product_number) REFERENCES Products(p_id)
+);
+
+
+INSERT INTO Products VALUES (1, 'Product A', 50.00, 100);
+INSERT INTO Products VALUES (2, 'Product B', 75.00, 150);
+INSERT INTO Products VALUES (3, 'Product C', 100.00, 200);
+INSERT INTO Products VALUES (4, 'Product D', 25.00, 75);
+INSERT INTO Products VALUES (5, 'Product E', 120.00, 300);
+
+
+INSERT INTO Orders VALUES ('O1001', '2022-01-01');
+INSERT INTO Orders VALUES ('O1002', '2022-02-15');
+INSERT INTO Orders VALUES ('O1003', '2022-03-10');
+
+
+INSERT INTO Order_details VALUES ('O1001', 1, 10);
+INSERT INTO Order_details VALUES ('O1001', 2, 20);
+INSERT INTO Order_details VALUES ('O1002', 3, 15);
+INSERT INTO Order_details VALUES ('O1003', 4, 5);
+INSERT INTO Order_details VALUES ('O1003', 5, 25);
+```
+
+
+### iii. Constraint on OrderID Starting with 'O'
+
+
+To include the constraint that order_id starts with the letter 'O', you can use the following SQL command:
+
+
+```sql
+ALTER TABLE Orders
+ADD CONSTRAINT order_id_check CHECK (order_id LIKE 'O%');
+```
+
+
+### iv. Displaying ProdID and Sum of Quantity Ordered for Each Product
+
+
+To display the p_id and the sum of quantity ordered for each product, you can use the following SQL query:
+
+
+```sql
+SELECT product_number AS ProdID, SUM(qty_ordered) AS Total_Quantity_Ordered
+FROM Order_details
+GROUP BY product_number;
+```
+
+
+### v. Creating a View to Track Product, Price, OrderID, Quantity Ordered, and Order Date
+
+
+```sql
+CREATE VIEW Product_Order_Details AS
+SELECT p.p_id AS P_id, p.retail_price AS Price, od.order_number AS Order_ID, od.qty_ordered AS Qty_Ordered, o.order_date AS Ordered_Date
+FROM Products p
+JOIN Order_details od ON p.p_id = od.product_number
+JOIN Orders o ON od.order_number = o.order_id;
+```
+
+
+This view keeps track of the product ID, price, order ID, quantity ordered, and order date.
+
+
+### vi. Database Trigger to Delete Orders After Corresponding Order Details
+
+
+```sql
+CREATE OR REPLACE TRIGGER delete_orders_after_order_details
+AFTER DELETE ON Order_details
+FOR EACH ROW
+BEGIN
+    DELETE FROM Orders
+    WHERE order_id = :OLD.order_number;
+END;
+/
+```
+
+
+This trigger will automatically delete the corresponding order from the Orders table after the deletion of the order details in the Order_details table.
