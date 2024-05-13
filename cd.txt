@@ -768,11 +768,58 @@ java SyntaxTree.java
 
 
 
+
 Exp 9. Write an Intermediate code generation for If/While.
 
+
+public class If_While_Code {
+    
+    // Function to generate code for the if statement
+    public static String generateIfCode(String condition, String action) {
+        String code = "if (" + condition + ") {\n";
+        code += "\t" + action + "\n";
+        code += "}";
+        return code;
+    }
+
+    // Function to generate code for the while loop
+    public static String generateWhileCode(String condition, String action) {
+        String code = "while (" + condition + ") {\n";
+        code += "\t" + action + "\n";
+        code += "}";
+        return code;
+    }
+
+    public static void main(String[] args) {
+        
+        // Example input: if (x > 8) { y = x * 2; }
+        String if_condition = "x > 8";
+        String if_action = "y = x * 2;";
+        
+        String ifCode = generateIfCode(if_condition, if_action);
+        System.out.println("Generated code for If statement:\n" + ifCode);
+        
+        // Example input: while (i < 10) { System.out.println(i); i++; }
+        String while_condition = "i < 10";
+        String while_action = "System.out.println(i); i++;";
+        
+        String whileCode = generateWhileCode(while_condition, while_action);
+        System.out.println("Generated code for While loop:\n" + whileCode);
+    }
+}
+
+
+
+Exp 9 Different : IF-While CODE Generation:
+
+
+
 import java.util.*;
-public class IntermediateCodeGenerator {
+
+public class If_While_Code2 {
+
     private static int labelCounter = 0;
+
     public static void main(String[] args) {
         String javaCode = "int x = 5;\n" +
                           "if (x > 0) {\n" +
@@ -787,9 +834,11 @@ public class IntermediateCodeGenerator {
         String intermediateCode = generateIntermediateCode(javaCode);
         System.out.println(intermediateCode);
     }
+
     public static String generateIntermediateCode(String javaCode) {
         StringBuilder intermediateCode = new StringBuilder();
         String[] lines = javaCode.split("\n");
+
         for (String line : lines) {
             line = line.trim();
             if (line.startsWith("if")) {
@@ -801,19 +850,19 @@ public class IntermediateCodeGenerator {
                 intermediateCode.append(line).append("\n");
             }
         }
+
         return intermediateCode.toString();
     }
+
     public static String generateIfIntermediateCode(String ifStatement) {
         String condition = ifStatement.substring(ifStatement.indexOf("(") + 1, ifStatement.indexOf(")")).trim();
         String trueLabel = getNextLabel();
         String falseLabel = getNextLabel();
         String intermediateCode = String.format("if (%s) goto %s;\n", condition, falseLabel);
         intermediateCode += "  // True branch\n";
-        // Here you can add intermediate code for statements inside the if block
         intermediateCode += String.format("goto %s;\n", trueLabel);
         intermediateCode += String.format("%s:\n", falseLabel);
         intermediateCode += "  // False branch\n";
-        // Here you can add intermediate code for statements inside the else block
         intermediateCode += String.format("%s:\n", trueLabel);
         return intermediateCode;
     }
@@ -824,7 +873,6 @@ public class IntermediateCodeGenerator {
         String endLabel = getNextLabel();
         String intermediateCode = String.format("%s:\n", startLabel);
         intermediateCode += String.format("if (!(%s)) goto %s;\n", condition, endLabel);
-        // Here you can add intermediate code for statements inside the while loop
         intermediateCode += String.format("goto %s;\n", startLabel);
         intermediateCode += String.format("%s:\n", endLabel);
         return intermediateCode;
@@ -832,39 +880,6 @@ public class IntermediateCodeGenerator {
 
     public static String getNextLabel() {
         return "L" + labelCounter++;
-    }
-}
-
-
-
-Different : IF CODE Generation:
-
-import java.util.*;
-public class IfCodeGeneration {
-    public static void main(String[] args) {
-        // Example input: if (x > 5) { y = x * 2; }
-        String condition = "x > 5";
-        String action = "y = x * 2;";
- 
-        // Generate code for the if statement   
-        String generatedCode = generateIfCode(condition, action);
-    
-        System.out.println("Generated code:");
-        System.out.println(generatedCode);
-    }
-    public static String generateIfCode(String condition, String action) {
-        StringBuilder codeBuilder = new StringBuilder();
-
-        // Add the if statement
-        codeBuilder.append("if (").append(condition).append(") {\n");
-
-        // Add the action inside the if block
-        codeBuilder.append("\t").append(action).append("\n");
-
-        // Close the if block
-        codeBuilder.append("}");
-
-        return codeBuilder.toString();
     }
 }
 
